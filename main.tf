@@ -18,4 +18,6 @@ module "stg01" {
   storage_account_name = var.storage_account_name
   network_rules        = var.network_rules
   tags                 = var.tags
+
+  depends_on = [ module.rg01 ]
 }
