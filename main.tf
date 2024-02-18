@@ -127,26 +127,26 @@ module "virtual-machine" {
   depends_on = [module.vnet1]
 }
 
-module "web_app" {
-  source = "./modules/Windows_Web_App"
+# module "web_app" {
+#   source = "./modules/Windows_Web_App"
 
-  resource_group             = module.rg01.rg_name
-  location                   = module.rg01.rg_location
-  service_plan               = "web-win-plan"
-  web_app                    = "web-win-app-001"
-  app_log_categories         = var.app_log_categories
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.law01.id
-  enable_audit_log_analytics = true
-}
+#   resource_group             = module.rg01.rg_name
+#   location                   = module.rg01.rg_location
+#   service_plan               = "web-win-plan"
+#   web_app                    = "web-win-app-001"
+#   app_log_categories         = var.app_log_categories
+#   log_analytics_workspace_id = azurerm_log_analytics_workspace.law01.id
+#   enable_audit_log_analytics = true
+# }
 
-module "mssql" {
-  source = "./modules/mssql"
+# module "mssql" {
+#   source = "./modules/mssql"
 
-  resource_group             = module.rg01.rg_name
-  mssql_server               = var.mssql_server
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.law01.id
-  enable_audit_log_analytics = true
-}
+#   resource_group             = module.rg01.rg_name
+#   mssql_server               = var.mssql_server
+#   log_analytics_workspace_id = azurerm_log_analytics_workspace.law01.id
+#   enable_audit_log_analytics = true
+# }
 
 # resource "azurerm_mssql_server_extended_auditing_policy" "audit" {
 #   server_id              = data.azurerm_mssql_server.sql.id
@@ -163,33 +163,33 @@ module "mssql" {
 #   }
 # }
 
-resource "azurerm_monitor_diagnostic_setting" "diag_settings_app" {
-  name                       = "sql-db-diag-rule-01"
-  target_resource_id         = data.azurerm_mssql_database.sqldb.id
-  log_analytics_workspace_id = data.azurerm_log_analytics_workspace.law01.id
+# resource "azurerm_monitor_diagnostic_setting" "diag_settings_app" {
+#   name                       = "sql-db-diag-rule-01"
+#   target_resource_id         = data.azurerm_mssql_database.sqldb.id
+#   log_analytics_workspace_id = data.azurerm_log_analytics_workspace.law01.id
 
-  enabled_log {
-    category = "SQLInsights"
-  }
-  enabled_log {
-    category = "AutomaticTuning"
-  }
-  enabled_log {
-    category = "QueryStoreRuntimeStatistics"
-  }
-  enabled_log {
-    category = "QueryStoreWaitStatistics"
-  }
-  enabled_log {
-    category = "Errors"
-  }
-  enabled_log {
-    category = "DatabaseWaitStatistics"
-  }
-  enabled_log {
-    category = "Timeouts"
-  }
-  enabled_log {
-    category = "Deadlocks"
-  }
-}
+#   enabled_log {
+#     category = "SQLInsights"
+#   }
+#   enabled_log {
+#     category = "AutomaticTuning"
+#   }
+#   enabled_log {
+#     category = "QueryStoreRuntimeStatistics"
+#   }
+#   enabled_log {
+#     category = "QueryStoreWaitStatistics"
+#   }
+#   enabled_log {
+#     category = "Errors"
+#   }
+#   enabled_log {
+#     category = "DatabaseWaitStatistics"
+#   }
+#   enabled_log {
+#     category = "Timeouts"
+#   }
+#   enabled_log {
+#     category = "Deadlocks"
+#   }
+# }
