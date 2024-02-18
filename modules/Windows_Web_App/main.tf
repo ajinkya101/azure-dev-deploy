@@ -14,17 +14,17 @@ resource "azurerm_windows_web_app" "web_app" {
   site_config {}
 }
 
-resource "azurerm_monitor_diagnostic_setting" "diag_settings_app" {
-  count                      = var.enable_audit_log_analytics == true ? 1 : 0
-  name                       = "app-diag-rule"
-  target_resource_id         = azurerm_windows_web_app.web_app.id
-  log_analytics_workspace_id = var.log_analytics_workspace_id
+# resource "azurerm_monitor_diagnostic_setting" "diag_settings_app" {
+#   count                      = var.enable_audit_log_analytics == true ? 1 : 0
+#   name                       = "app-diag-rule"
+#   target_resource_id         = azurerm_windows_web_app.web_app.id
+#   log_analytics_workspace_id = var.log_analytics_workspace_id
 
-  dynamic "enabled_log" {
-    for_each = var.app_log_categories
+#   dynamic "enabled_log" {
+#     for_each = var.app_log_categories
 
-    content {
-      category = enabled_log.value
-    }
-  }
-}
+#     content {
+#       category = enabled_log.value
+#     }
+#   }
+# }

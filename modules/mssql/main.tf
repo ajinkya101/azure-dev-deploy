@@ -71,3 +71,36 @@ resource "azurerm_monitor_diagnostic_setting" "sqldiag" {
     }
   }
 }
+
+resource "azurerm_monitor_diagnostic_setting" "diag_settings_app" {
+  for_each                   = { for k, v in var.mssql_server : k => v if var.enable_audit_log_analytics }
+
+  name                       = "sql-diag-rule-01"
+  target_resource_id         = azurerm_mssql_database.sqldb[each.key].id
+  log_analytics_workspace_id = var.log_analytics_workspace_id
+
+  enabled_log {
+    category = "SQLInsights"
+  }
+  enabled_log {
+    category = "AutomaticTuning"
+  }
+  enabled_log {
+    category = "QueryStoreRuntimeStatistics"
+  }
+  enabled_log {
+    category = "QueryStoreWaitStatistics"
+  }
+  enabled_log {
+    category = "Errors"
+  }
+  enabled_log {
+    category = "DatabaseWaitStatistics"
+  }
+  enabled_log {
+    category = "Timeouts"
+  }
+  enabled_log {
+    category = "Deadlocks"
+  }
+}

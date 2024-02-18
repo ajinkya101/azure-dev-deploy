@@ -147,3 +147,49 @@ module "mssql" {
   log_analytics_workspace_id = azurerm_log_analytics_workspace.law01.id
   enable_audit_log_analytics = true
 }
+
+# resource "azurerm_mssql_server_extended_auditing_policy" "audit" {
+#   server_id              = data.azurerm_mssql_server.sql.id
+#   log_monitoring_enabled = true
+# }
+
+# resource "azurerm_monitor_diagnostic_setting" "sqldiag" {
+#   name                       = "sql-diagnotic-setting"
+#   target_resource_id         = "${data.azurerm_mssql_server.sql.id}/databases/master"
+#   log_analytics_workspace_id = azurerm_log_analytics_workspace.law01.id
+
+#   enabled_log {
+#     category = "SQLSecurityAuditEvents"
+#   }
+# }
+
+resource "azurerm_monitor_diagnostic_setting" "diag_settings_app" {
+  name                       = "sql-db-diag-rule-01"
+  target_resource_id         = data.azurerm_mssql_database.sqldb.id
+  log_analytics_workspace_id = data.azurerm_log_analytics_workspace.law01.id
+
+  enabled_log {
+    category = "SQLInsights"
+  }
+  enabled_log {
+    category = "AutomaticTuning"
+  }
+  enabled_log {
+    category = "QueryStoreRuntimeStatistics"
+  }
+  enabled_log {
+    category = "QueryStoreWaitStatistics"
+  }
+  enabled_log {
+    category = "Errors"
+  }
+  enabled_log {
+    category = "DatabaseWaitStatistics"
+  }
+  enabled_log {
+    category = "Timeouts"
+  }
+  enabled_log {
+    category = "Deadlocks"
+  }
+}
