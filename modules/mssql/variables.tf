@@ -1,29 +1,4 @@
-variable "rg_name" {
-  description = "Name of resource groups"
-  type        = string
-}
-
-variable "region" {
-  description = "Location of Resource groups"
-  type        = string
-}
-
-variable "storage_account_name" {
-  type        = string
-  description = "Specifies the name of the storage account"
-}
-
-variable "network_rules" {
-  description = "Network rules restricing access to the storage account."
-  type        = object({ bypass = list(string), ip_rules = list(string), subnet_ids = list(string) })
-  default     = null
-}
-
-variable "app_log_categories" {
-  type        = list(string)
-  default     = null
-  description = "List of log categories. Defaults to all available."
-}
+variable "resource_group" {}
 
 variable "mssql_server" {
   type = map(object({
@@ -65,8 +40,20 @@ variable "mssql_server" {
   }
 }
 
-variable "tags" {
-  description = "A map of tags to add to all resources"
-  type        = map(string)
-  default     = {}
+variable "sql_log_categories" {
+  type        = list(string)
+  default     = ["SQLSecurityAuditEvents"]
+  description = "List of log categories. Defaults to all available."
+}
+
+variable "log_analytics_workspace_id" {
+  type        = string
+  default     = null
+  description = "ID of Log analytics resource"
+}
+
+variable "enable_audit_log_analytics" {
+  type        = bool
+  default     = false
+  description = "Enab;e audit with Log analytics workspace solution"
 }

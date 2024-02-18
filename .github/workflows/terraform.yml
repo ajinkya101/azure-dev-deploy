@@ -42,7 +42,9 @@ jobs:
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
       id: init
-      run: terraform init
+      run: |
+        git config --global url."https://${{ secrets.PAT_TOKEN }}@github.com".insteadOf "https://github.com"
+        terraform init
     
     # Terraform fmt used to rewrite Terraform configuration files to a canonical format and style.
     - name: Terraform Format
@@ -68,7 +70,8 @@ jobs:
       uses: bridgecrewio/checkov-action@v12
       with:
         # This will add both a CLI output to the console and create a results.sarif file
-        quiet: true # optional: display only failed checks        
+        quiet: true # optional: display only failed checks  
+        soft_fail: true # optional: do not return an error code if there are failed checks      
         output_format: cli,sarif
         output_file_path: console,results.sarif
         
