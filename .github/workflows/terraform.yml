@@ -8,24 +8,17 @@ on:
 
 permissions:
       id-token: write
-      contents: write
-      pull-requests: write
-      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      contents: read
 
 jobs:
   terraform-deploy:
-    name: 'Terraform Plan and Apply'
+    name: 'Terraform'
     runs-on: ubuntu-latest
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
         shell: bash
-
-    env:
-      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
 
     steps:
     # Checkout the repository to the GitHub Actions runner
@@ -39,6 +32,12 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
   
+    - name: 'Run Azure CLI commands'
+      run: |
+          az account show
+          az group list
+          pwd 
+
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
       id: init
@@ -54,10 +53,14 @@ jobs:
       id: validate
       run: terraform validate -no-color
 
+    - name: Checkov scan
+      id: checkov
+      uses: bridgecrewio/checkov-action@master
+
     # Generates an execution plan for Terraform
     - name: Terraform Plan
       id: plan
-      run: terraform plan -no-color
+      run: terraform plan -no-color -out plan.tfplan
       continue-on-error: true
 
     - uses: actions/github-script@0.9.0
@@ -89,16 +92,26 @@ jobs:
             body: output
           })
 
+    # Plan file is used by Infracost for Cost estimates
+    - name: "Terraform show"
+      id: show
+      run: terraform show -json plan.tfplan
+      
+    - name: "Save Plan JSON"
+      run: echo '${{ steps.show.outputs.stdout }}' > plan.json # Do not change
+
+    - name: Run infracost diff
+      uses: infracost/infracost-gh-action@master # Use a specific version instead of master if locking is preferred
+      env:
+        INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        entrypoint: /scripts/ci/diff.sh # Do not change
+        path: plan.json # Do not change
+
     - name: Terraform Plan Status
       if: steps.plan.outcome == 'failure'
       run: exit 1
-
-    - name: Checkov GitHub Action
-      uses: bridgecrewio/checkov-action@v12
-      with:
-        # This will add both a CLI output to the console and create a results.sarif file
-        quiet: true # optional: display only failed checks        
-        output_format: cli
 
       # On push to main, build or change infrastructure according to Terraform configuration files
       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
