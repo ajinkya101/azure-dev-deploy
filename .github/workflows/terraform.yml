@@ -81,7 +81,7 @@ jobs:
           <details><summary>Show Plan</summary>
 
           \`\`\`\n
-          ${{ steps.plan.outputs.plan }}
+          ${{ steps.plan-publish.outputs.plan }}
           \`\`\`
 
           </details>
