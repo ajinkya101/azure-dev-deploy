@@ -119,26 +119,18 @@ jobs:
         echo 'EOF' >> $GITHUB_OUTPUT
 
     - uses: actions/github-script@0.9.0
-      if: github.event_name == 'pull_request'
+      if: github.event.review.state == 'approved' 
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
-          Terraform Apply:
+          const name = '${{ github.workflow   }}';
+          const url = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
+          const success = '${{ job.status }}' === 'success';
+          const body = `${name}: ${success ? 'succeeded ✅' : 'failed ❌'}\n${url}`;
 
-          <details><summary>Show Apply</summary>
-
-          \`\`\`\n
-          ${{ steps.apply.outputs.apply }}
-          \`\`\`
-
-          </details>
-
-          *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-
-          github.issues.createComment({
+          await github.rest.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: output
+            body: body
           })
-
