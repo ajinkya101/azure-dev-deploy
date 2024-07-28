@@ -99,16 +99,46 @@ jobs:
       if: steps.plan.outcome == 'failure'
       run: exit 1
 
-    # - name: Checkov GitHub Action
-    #   uses: bridgecrewio/checkov-action@v12
-    #   with:
-    #     # This will add both a CLI output to the console and create a results.sarif file
-    #     quiet: true # optional: display only failed checks        
-    #     output_format: cli,sarif
-    #     output_file_path: console
+    - name: Checkov GitHub Action
+      uses: bridgecrewio/checkov-action@v12
+      with:
+        # This will add both a CLI output to the console and create a results.sarif file
+        quiet: true # optional: display only failed checks        
+        output_format: cli,sarif
+        output_file_path: console
 
       # On push to main, build or change infrastructure according to Terraform configuration files
       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
+
     - name: Terraform Apply
+      id: apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: terraform apply -auto-approve
+      run: |
+        echo 'apply<<EOF' >> $GITHUB_OUTPUT
+        terraform apply -input=false -no-color tfplan >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT
+
+    - uses: actions/github-script@0.9.0
+      if: github.event_name == 'pull_request'
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          Terraform Apply:
+
+          <details><summary>Show Apply</summary>
+
+          \`\`\`\n
+          ${{ steps.apply.outputs.apply }}
+          \`\`\`
+
+          </details>
+
+          *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+          github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: output
+          })
+
