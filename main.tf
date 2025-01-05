@@ -11,7 +11,7 @@ module "rg01" {
 }
 
 module "stg01" {
-  source = "git::https://github.com/ajinkya101/azure-storage-account-module.git?ref=v0.0.2"
+  source = "git::https://github.com/ajinkya101/azure-storage-account-module.git?ref=v0.0.4"
   #checkov:skip=CKV_TF_1 "Ensure Terraform module sources use a commit hash" Not Required
   rg_name              = var.rg_name
   location             = var.region
@@ -19,5 +19,5 @@ module "stg01" {
   network_rules        = var.network_rules
   tags                 = var.tags
 
-  depends_on = [ module.rg01 ]
+  depends_on = [module.rg01]
 }
