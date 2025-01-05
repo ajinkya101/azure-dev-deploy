@@ -30,6 +30,8 @@ jobs:
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v2
+      
+    - uses: hashicorp/setup-terraform@v3
 
     - name: 'Az CLI login'
       uses: azure/login@v1
