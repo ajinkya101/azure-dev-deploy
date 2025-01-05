@@ -19,5 +19,5 @@ module "stg01" {
   network_rules        = var.network_rules
   tags                 = var.tags
 
-  depends_on = [ module.rg01 ]
+  depends_on = [module.rg01]
 }
