@@ -1,4 +1,6 @@
 rg_name              = "devrg01"
+
+// The region should be canadacentral only
 region               = "canadacentral"
 storage_account_name = "stg737047"
 network_rules = {
