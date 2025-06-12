@@ -1,5 +1,5 @@
 rg_name              = "devrg01"
-region               = "canadacentral"
+region               = "canadaeast"
 storage_account_name = "stg737047"
 network_rules = {
   bypass     = ["AzureServices"]
